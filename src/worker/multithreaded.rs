@@ -5,6 +5,8 @@
 //! However, that would be more complex, so we use this as a starting point.
 
 use std::{mem, io, sync::mpsc::{self, Sender}};
+
+use alloc::vec::Vec;
 use crate::decoder::MAX_COMPONENTS;
 use crate::error::Result;
 use super::{RowData, Worker};

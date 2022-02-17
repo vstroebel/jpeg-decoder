@@ -1,3 +1,4 @@
+#[cfg(feature = "std")]
 use std::io::Read;
 
 use crate::Error;
@@ -20,6 +21,7 @@ pub trait JpegRead {
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: Read> JpegRead for T {
     fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), Error> {
         Ok(Read::read_exact(self, buf)?)

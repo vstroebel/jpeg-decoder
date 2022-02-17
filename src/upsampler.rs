@@ -164,6 +164,19 @@ impl Upsample for UpsamplerH2V1 {
     }
 }
 
+#[cfg(feature = "std")]
+fn fract(v: f32) -> f32 {
+    v.fract()
+}
+
+#[cfg(not(feature = "std"))]
+fn fract(v: f32) -> f32 {
+    // This implementation only works for positive numbers
+    debug_assert!(v >= 0.0);
+    let int = v as usize as f32;
+    v - int
+}
+
 impl Upsample for UpsamplerH1V2 {
     fn upsample_row(&self,
                     input: &[u8],
@@ -176,7 +189,7 @@ impl Upsample for UpsamplerH1V2 {
         let row_near = row as f32 / 2.0;
         // If row_near's fractional is 0.0 we want row_far to be the previous row and if it's 0.5 we
         // want it to be the next row.
-        let row_far = (row_near + row_near.fract() * 3.0 - 0.25).min((input_height - 1) as f32);
+        let row_far = (row_near + fract(row_near) * 3.0 - 0.25).min((input_height - 1) as f32);
 
         let input_near = &input[row_near as usize * row_stride ..];
         let input_far = &input[row_far as usize * row_stride ..];
@@ -202,7 +215,7 @@ impl Upsample for UpsamplerH2V2 {
         let row_near = row as f32 / 2.0;
         // If row_near's fractional is 0.0 we want row_far to be the previous row and if it's 0.5 we
         // want it to be the next row.
-        let row_far = (row_near + row_near.fract() * 3.0 - 0.25).min((input_height - 1) as f32);
+        let row_far = (row_near + fract(row_near) * 3.0 - 0.25).min((input_height - 1) as f32);
 
         let input_near = &input[row_near as usize * row_stride ..];
         let input_far = &input[row_far as usize * row_stride ..];

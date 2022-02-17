@@ -1,8 +1,16 @@
-use alloc::boxed::Box;
+
 use alloc::string::String;
-use alloc::fmt;
 use core::result;
+
+#[cfg(feature = "std")]
+use alloc::boxed::Box;
+
+#[cfg(feature = "std")]
+use alloc::fmt;
+
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
+#[cfg(feature = "std")]
 use std::io::Error as IoError;
 
 pub type Result<T> = result::Result<T, Error>;
@@ -37,12 +45,17 @@ pub enum Error {
     Format(String),
     /// The image makes use of a JPEG feature not (currently) supported by this library.
     Unsupported(UnsupportedFeature),
+
+    #[cfg(feature = "std")]
     /// An I/O error occurred while decoding the image.
     Io(IoError),
+
+    #[cfg(feature = "std")]
     /// An internal error occurred while decoding the image.
     Internal(Box<dyn StdError + Send + Sync + 'static>), //TODO: not used, can be removed with the next version bump
 }
 
+#[cfg(feature = "std")]
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -54,6 +67,7 @@ impl fmt::Display for Error {
     }
 }
 
+#[cfg(feature = "std")]
 impl StdError for Error {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match *self {
@@ -64,6 +78,7 @@ impl StdError for Error {
     }
 }
 
+#[cfg(feature = "std")]
 impl From<IoError> for Error {
     fn from(err: IoError) -> Error {
         Error::Io(err)
